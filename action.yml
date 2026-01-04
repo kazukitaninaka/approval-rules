@@ -1,0 +1,55 @@
+name: "Approval Rules"
+description: "A GitHub Action to enforce conditional approval rules on pull requests"
+author: "kazukitaninaka"
+branding:
+  icon: "check-circle"
+  color: "green"
+
+inputs:
+  github-token:
+    description: "GitHub token for API access"
+    required: false
+    default: ${{ github.token }}
+  approval-rules:
+    description: "Approval rules to enforce"
+    required: true
+    type: "array"
+    items:
+      type: "object"
+      properties:
+        name:
+          description: "Name of the approval rule"
+          type: "string"
+          default: "Approval Rule"
+        if:
+          description: "Conditions for the approval rule"
+          type: "object":
+          properties:
+            from_branch:
+              description: "Branch to compare against"
+              type: "object"
+              properties:
+                pattern:
+                  description: "Pattern to match the branch name"
+                  type: "string"
+                  required: true
+            has_author_in:
+              description: "Check if the pull request author is in the list"
+              type: "object"
+              properties:
+                users:
+                  description: "List of usernames to check if the pull request author is in the list"
+                  type: "array"
+                  items:
+                    type: "string"
+        requires:
+          description: "Requirements for the approval rule"
+          type: "object"
+          properties:
+            count:
+              description: "Minimum number of approvals required"
+              type: "number"
+              required: true
+runs:
+  using: "node20"
+  main: "dist/index.js"
