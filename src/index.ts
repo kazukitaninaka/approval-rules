@@ -29,6 +29,8 @@ const run = async (): Promise<void> => {
       headSha: 'head' in payload ? payload.head.sha : payload.pull_request?.head?.sha,
     };
 
+    core.info(`prMeta: ${JSON.stringify(prMeta)}`);
+
     const octokit = getOctokit(token);
     const reviews = await octokit.paginate(octokit.rest.pulls.listReviews, {
       owner: context.repo.owner,

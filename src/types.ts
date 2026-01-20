@@ -6,7 +6,7 @@ export type Review = ListPullRequestReviewsResponse['data'][number];
 
 export type ApprovalRule = {
   name: string;
-  if: {
+  if?: {
     from_branch?: {
       pattern: string;
     };
