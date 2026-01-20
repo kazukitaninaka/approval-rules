@@ -20,6 +20,7 @@ pnpm typecheck        # Run TypeScript type checking
 ```
 
 To run a single test file:
+
 ```bash
 pnpm vitest run src/validator.test.ts
 ```
