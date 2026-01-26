@@ -49,6 +49,7 @@ const run = async (): Promise<void> => {
       .find((result) => result?.approved);
 
     if (satisfiedRule != null) {
+      core.info(`satisfiedRule: ${satisfiedRule.rule.name}`);
       await octokit.rest.repos.createCommitStatus({
         owner: context.repo.owner,
         repo: context.repo.repo,
@@ -57,8 +58,10 @@ const run = async (): Promise<void> => {
         context: 'PR Approval Check',
         description: `${
           satisfiedRule.approved ? 'Approved' : 'Needs more approvals'
-        } (${satisfiedRule.approvalCount}/${satisfiedRule.requiredCount})`,
+        } (${satisfiedRule.approvalCount}/${satisfiedRule.rule.requires.count})`,
       });
+    } else {
+      core.info('No satisfied rule found');
     }
   } catch (error) {
     if (error instanceof Error) {

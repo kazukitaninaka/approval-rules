@@ -42,7 +42,7 @@ const createMockPayload = (overrides: Partial<PullRequest> = {}): PullRequest =>
     head: { ref: "feature/test", sha: "abc123" },
     user: { login: "author1" },
     ...overrides,
-  } as PullRequest);
+  }) as PullRequest;
 
 describe("validateApprovals", () => {
   describe("basic approval validation", () => {
@@ -197,7 +197,7 @@ describe("validateApprovals", () => {
       });
 
       expect(result?.approved).toBe(false);
-      expect(result?.requiredCount).toBe(3);
+      expect(result?.rule.requires.count).toBe(3);
     });
 
     it("should return null when from_branch pattern does not match", () => {
@@ -250,7 +250,7 @@ describe("validateApprovals", () => {
       });
 
       expect(result?.approved).toBe(false);
-      expect(result?.requiredCount).toBe(2);
+      expect(result?.rule.requires.count).toBe(2);
     });
 
     it("should return null when author is not in has_author_in list", () => {
@@ -303,7 +303,7 @@ describe("validateApprovals", () => {
 
       expect(result?.approved).toBe(false);
       expect(result?.approvalCount).toBe(1);
-      expect(result?.requiredCount).toBe(3);
+      expect(result?.rule.requires.count).toBe(3);
     });
   });
 });

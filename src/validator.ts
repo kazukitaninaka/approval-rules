@@ -58,6 +58,6 @@ export const validateApprovals = ({
   return {
     approved,
     approvalCount,
-    requiredCount: rule.requires.count,
+    rule,
   };
 };

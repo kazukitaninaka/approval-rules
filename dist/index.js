@@ -29294,14 +29294,18 @@ const run = async () => {
         })
             .find((result) => result?.approved);
         if (satisfiedRule != null) {
+            core.info(`satisfiedRule: ${satisfiedRule.rule.name}`);
             await octokit.rest.repos.createCommitStatus({
                 owner: github_1.context.repo.owner,
                 repo: github_1.context.repo.repo,
                 sha: prMeta.headSha,
                 state: satisfiedRule.approved ? 'success' : 'pending',
                 context: 'PR Approval Check',
-                description: `${satisfiedRule.approved ? 'Approved' : 'Needs more approvals'} (${satisfiedRule.approvalCount}/${satisfiedRule.requiredCount})`,
+                description: `${satisfiedRule.approved ? 'Approved' : 'Needs more approvals'} (${satisfiedRule.approvalCount}/${satisfiedRule.rule.requires.count})`,
             });
+        }
+        else {
+            core.info('No satisfied rule found');
         }
     }
     catch (error) {
@@ -29361,7 +29365,7 @@ const validateApprovals = ({ rule, reviews, payload, }) => {
     return {
         approved,
         approvalCount,
-        requiredCount: rule.requires.count,
+        rule,
     };
 };
 exports.validateApprovals = validateApprovals;

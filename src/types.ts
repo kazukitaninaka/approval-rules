@@ -22,5 +22,5 @@ export type ApprovalRule = {
 export type ValidationResult = {
   approved: boolean;
   approvalCount: number;
-  requiredCount: number;
+  rule: ApprovalRule;
 };
