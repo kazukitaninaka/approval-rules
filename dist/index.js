@@ -29259,11 +29259,8 @@ const core = __importStar(__nccwpck_require__(9093));
 const github_1 = __nccwpck_require__(3935);
 const validator_1 = __nccwpck_require__(203);
 const parseContext = (context) => {
-    if (context.eventName === 'pull_request') {
+    if (context.eventName === 'pull_request' || context.eventName === 'pull_request_review') {
         return context.payload.pull_request;
-    }
-    if (context.eventName === 'pull_request_review') {
-        return context.payload.pull_request_review;
     }
     throw new Error('Invalid context event name');
 };
