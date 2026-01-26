@@ -16,7 +16,7 @@ jobs:
       statuses: write
     timeout-minutes: 10
     steps:
-      - uses: kazukitaninaka/approval-rules@main
+      - uses: kazukitaninaka/approval-rules@113c46e188b908ba2199573e6cf8ca330034f894
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           approval-rules: |
