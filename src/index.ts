@@ -6,11 +6,8 @@ import type { ApprovalRule } from './types';
 import { validateApprovals } from './validator';
 
 const parseContext = (context: typeof github.context): PullRequest | PullRequestReviewEvent => {
-  if (context.eventName === 'pull_request') {
+  if (context.eventName === 'pull_request' || context.eventName === 'pull_request_review') {
     return context.payload.pull_request as PullRequest;
-  }
-  if (context.eventName === 'pull_request_review') {
-    return context.payload.pull_request_review as PullRequestReviewEvent;
   }
   throw new Error('Invalid context event name');
 };
