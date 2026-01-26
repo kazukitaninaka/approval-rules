@@ -1,4 +1,5 @@
 import type { PullRequest, PullRequestReviewEvent } from '@octokit/webhooks-types';
+import { type RuleContext, evaluateConditions } from './rules';
 import type { ApprovalRule, Review, ValidationResult } from './types';
 
 export const validateApprovals = ({
@@ -34,21 +35,13 @@ export const validateApprovals = ({
   ).length;
   const approved = approvalCount >= rule.requires.count;
 
-  let isTarget = true;
+  const context: RuleContext = {
+    fromBranch: 'head' in payload ? payload.head.ref : (payload.pull_request?.head?.ref ?? ''),
+    author:
+      'user' in payload ? (payload.user?.login ?? '') : (payload.pull_request?.user?.login ?? ''),
+  };
 
-  const fromBranch = 'head' in payload ? payload.head.ref : payload.pull_request?.head?.ref;
-  const author = 'user' in payload ? payload.user?.login : payload.pull_request?.user?.login;
-
-  // from_branch pattern check
-  if (rule.if?.from_branch != null) {
-    const pattern = new RegExp(rule.if.from_branch.pattern);
-    isTarget = isTarget && pattern.test(fromBranch);
-  }
-
-  // has_author_in user check
-  if (rule.if?.has_author_in != null) {
-    isTarget = isTarget && rule.if.has_author_in.users.includes(author);
-  }
+  const isTarget = evaluateConditions(rule.if, context);
 
   // NOTE: matches nothing when if is set but none of the conditions are met
   if (rule.if != null && !isTarget) {

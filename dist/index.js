@@ -29322,13 +29322,71 @@ run();
 
 /***/ }),
 
-/***/ 203:
+/***/ 887:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.fromBranchCondition = void 0;
+exports.fromBranchCondition = {
+    name: 'from_branch',
+    evaluate: (config, ctx) => new RegExp(config.pattern).test(ctx.fromBranch),
+};
+
+
+/***/ }),
+
+/***/ 2940:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.hasAuthorInCondition = void 0;
+exports.hasAuthorInCondition = {
+    name: 'has_author_in',
+    evaluate: (config, ctx) => config.users.includes(ctx.author),
+};
+
+
+/***/ }),
+
+/***/ 4835:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.evaluateConditions = void 0;
+const from_branch_1 = __nccwpck_require__(887);
+const has_author_in_1 = __nccwpck_require__(2940);
+const conditions = [from_branch_1.fromBranchCondition, has_author_in_1.hasAuthorInCondition];
+const conditionRegistry = new Map(conditions.map((c) => [c.name, c]));
+const evaluateConditions = (ruleIf, context) => {
+    if (ruleIf == null)
+        return true;
+    for (const [key, config] of Object.entries(ruleIf)) {
+        const condition = conditionRegistry.get(key);
+        if (condition && !condition.evaluate(config, context)) {
+            return false;
+        }
+    }
+    return true;
+};
+exports.evaluateConditions = evaluateConditions;
+
+
+/***/ }),
+
+/***/ 203:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateApprovals = void 0;
+const rules_1 = __nccwpck_require__(4835);
 const validateApprovals = ({ rule, reviews, payload, }) => {
     // get the latest review status for each user
     const latestReviewByUser = new Map();
@@ -29346,18 +29404,11 @@ const validateApprovals = ({ rule, reviews, payload, }) => {
     }
     const approvalCount = Array.from(latestReviewByUser.values()).filter((review) => review.state === 'APPROVED').length;
     const approved = approvalCount >= rule.requires.count;
-    let isTarget = true;
-    const fromBranch = 'head' in payload ? payload.head.ref : payload.pull_request?.head?.ref;
-    const author = 'user' in payload ? payload.user?.login : payload.pull_request?.user?.login;
-    // from_branch pattern check
-    if (rule.if?.from_branch != null) {
-        const pattern = new RegExp(rule.if.from_branch.pattern);
-        isTarget = isTarget && pattern.test(fromBranch);
-    }
-    // has_author_in user check
-    if (rule.if?.has_author_in != null) {
-        isTarget = isTarget && rule.if.has_author_in.users.includes(author);
-    }
+    const context = {
+        fromBranch: 'head' in payload ? payload.head.ref : (payload.pull_request?.head?.ref ?? ''),
+        author: 'user' in payload ? (payload.user?.login ?? '') : (payload.pull_request?.user?.login ?? ''),
+    };
+    const isTarget = (0, rules_1.evaluateConditions)(rule.if, context);
     // NOTE: matches nothing when if is set but none of the conditions are met
     if (rule.if != null && !isTarget) {
         return null;
