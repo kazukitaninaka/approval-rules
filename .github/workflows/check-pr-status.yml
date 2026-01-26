@@ -1,0 +1,52 @@
+name: Check PR Status
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  pull_request_review:
+    types: [submitted, dismissed]
+
+jobs:
+  check-pr-status:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      packages: read
+      statuses: write
+    timeout-minutes: 10
+    steps:
+      - uses: kazukitaninaka/approval-rules@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          approval-rules: |
+            [
+              {
+                "name": "test",
+                "if": {
+                  "from_branch": {
+                    "pattern": "^test/.*"
+                  }
+                },
+                "requires": {
+                  "count": 1
+                }
+              },
+              {
+                "name": "",
+                "if": {
+                  "has_author_in": {
+                    "users": ["proto-pigeon[bot]"]
+                  }
+                },
+                "requires": {
+                  "count": 2
+                }
+              },
+              {
+                "name": "default",
+                "requires": {
+                  "count": 3
+                }
+              }
+            ]
