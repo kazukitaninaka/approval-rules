@@ -22,6 +22,8 @@ const run = async (): Promise<void> => {
 
     const parsedApprovalRules = JSON.parse(approvalRules) as ApprovalRule[];
 
+    core.info(`eventName: ${context.eventName}`);
+
     const payload = parseContext(context);
 
     const prMeta = {

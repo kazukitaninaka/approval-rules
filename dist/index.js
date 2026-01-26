@@ -29272,6 +29272,7 @@ const run = async () => {
         const token = core.getInput('github-token', { required: true });
         const approvalRules = core.getInput('approval-rules', { required: true });
         const parsedApprovalRules = JSON.parse(approvalRules);
+        core.info(`eventName: ${github_1.context.eventName}`);
         const payload = parseContext(github_1.context);
         const prMeta = {
             number: 'number' in payload ? payload.number : payload.pull_request?.number,
