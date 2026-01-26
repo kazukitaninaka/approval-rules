@@ -29292,7 +29292,7 @@ const run = async () => {
                 payload,
             });
         })
-            .find((result) => result?.approved);
+            .find((result) => result != null);
         if (satisfiedRule != null) {
             core.info(`satisfiedRule: ${satisfiedRule.rule.name}`);
             await octokit.rest.repos.createCommitStatus({
